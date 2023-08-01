@@ -2,7 +2,7 @@ package login
 
 // 102xx
 
-const ErrCodeUsernameOrPasswordWrong = 10000
+const ErrCodeUsernameOrPasswordWrong = 10200
 
 func GetStatusMessage(code int) string {
 	switch code {

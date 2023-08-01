@@ -1,23 +1,16 @@
 package register
 
 import (
-	"encoding/json"
 	"gotik/api"
 	svcregister "gotik/service/register"
 	err_comm "gotik/utils/error_codes/common"
 	err_register "gotik/utils/error_codes/register"
 	"gotik/utils/token"
 	verifyinput "gotik/utils/verify_input"
-	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-type registerInputJSON struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
 
 type registerOutputJSON struct {
 	StatusCode int    `json:"status_code"`
@@ -30,26 +23,11 @@ func RegisterHandler(ctx *gin.Context) {
 	// 用于作为返回的数据
 	outputData := registerOutputJSON{}
 
-	// 先把用户的json数据全部读出来
-	inputBytes, err := io.ReadAll(ctx.Request.Body)
-	if err != nil {
-		outputData.StatusCode = err_comm.ErrCodeInvalidArgs
-		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
-		ctx.JSON(http.StatusOK, &outputData)
-		return
-	}
-
-	// 把字节数据转成结构体
-	inputData := registerInputJSON{}
-	if err := json.Unmarshal(inputBytes, &inputData); err != nil {
-		outputData.StatusCode = err_comm.ErrCodeInvalidArgs
-		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
-		ctx.JSON(http.StatusOK, &outputData)
-		return
-	}
+	username := ctx.Query("username")
+	password := ctx.Query("password")
 
 	// 检查字段的格式
-	if !verifyinput.IsUsernameValid(inputData.Username) || !verifyinput.IsPasswordValid(inputData.Password) {
+	if !verifyinput.IsUsernameValid(username) || !verifyinput.IsPasswordValid(password) {
 		outputData.StatusCode = err_comm.ErrCodeInvalidArgs
 		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
 		ctx.JSON(http.StatusOK, &outputData)
@@ -57,7 +35,7 @@ func RegisterHandler(ctx *gin.Context) {
 	}
 
 	// 开始进行业务
-	result, err := svcregister.DoRegister(api.DB, inputData.Username, inputData.Password)
+	result, err := svcregister.DoRegister(api.DB, username, password)
 
 	// mysql在本地, 不可能是网络错误, 我们无能为力直接退出
 	if err != nil {
@@ -69,7 +47,7 @@ func RegisterHandler(ctx *gin.Context) {
 		outputData.StatusCode = err_comm.ErrCodeOK
 		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)
 		outputData.UserID = result.ID
-		outputData.Token = token.NewToken(inputData.Username)
+		outputData.Token = token.NewToken(username)
 
 		ctx.JSON(200, &outputData)
 		return

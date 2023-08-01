@@ -1,23 +1,16 @@
 package login
 
 import (
-	"encoding/json"
 	"gotik/api"
 	svc_login "gotik/service/login"
 	err_comm "gotik/utils/error_codes/common"
 	err_login "gotik/utils/error_codes/login"
 	verifyinput "gotik/utils/verify_input"
 
-	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-type loginInputJSON struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
 
 type loginOutputJSON struct {
 	StatusCode int    `json:"status_code"`
@@ -29,31 +22,18 @@ type loginOutputJSON struct {
 func LoginHandler(ctx *gin.Context) {
 	outputData := loginOutputJSON{}
 
-	inputBytes, err := io.ReadAll(ctx.Request.Body)
-	if err != nil {
-		outputData.StatusCode = err_comm.ErrCodeInvalidArgs
-		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
-		ctx.JSON(http.StatusOK, &outputData)
-		return
-	}
-
-	inputData := loginInputJSON{}
-	if err := json.Unmarshal(inputBytes, &inputData); err != nil {
-		outputData.StatusCode = err_comm.ErrCodeInvalidArgs
-		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
-		ctx.JSON(http.StatusOK, &outputData)
-		return
-	}
+	username := ctx.Query("username")
+	password := ctx.Query("password")
 
 	// 这里判断一下而不查数据库是为了减小数据库的压力, 把能判断的东西尽量判断了
-	if !verifyinput.IsUsernameValid(inputData.Username) || !verifyinput.IsPasswordValid(inputData.Password) {
+	if !verifyinput.IsUsernameValid(username) || !verifyinput.IsPasswordValid(password) {
 		outputData.StatusCode = err_comm.ErrCodeInvalidArgs
 		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
 		ctx.JSON(http.StatusOK, &outputData)
 		return
 	}
 
-	result, err := svc_login.DoLogin(api.DB, inputData.Username, inputData.Password)
+	result, err := svc_login.DoLogin(api.DB, username, password)
 	if err != nil {
 		panic(err)
 	}

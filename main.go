@@ -42,8 +42,8 @@ func main() {
 
 	engine := gin.Default()
 
-	engine.POST("/douyin/user/register", register.RegisterHandler)
-	engine.POST("/douyin/user/login", login.LoginHandler)
+	engine.POST("/douyin/user/register/", register.RegisterHandler)
+	engine.POST("/douyin/user/login/", login.LoginHandler)
 
 	engine.Run("0.0.0.0:8888")
 }

@@ -18,7 +18,7 @@ func init() {
 	r := rand.New(rand.NewSource(time.Now().Unix()))
 	r.Uint64()
 	k := make([]byte, 0, 8)
-	k = binary.AppendUvarint(k, r.Uint64())
+	k = binary.BigEndian.AppendUint64(k, r.Uint64())
 	key = k
 }
 

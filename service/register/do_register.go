@@ -27,7 +27,7 @@ func DoRegister(db *gorm.DB, uname string, pword string) (*Result, error) {
 	// 执行插入
 	newUser := model.User{
 		Username:    uname,
-		PasswordMD5: md5.DoMD5(pword),
+		PasswordMD5: []byte(md5.DoMD5(pword)),
 	}
 
 	// 这里用到了个技巧, 利用unique的错误代码来判断用户名是否被注册

@@ -33,7 +33,7 @@ func DoLogin(db *gorm.DB, uname string, pword string) (*Result, error) {
 		return &result, nil
 	}
 
-	if u.PasswordMD5 != md5.DoMD5(pword) {
+	if string(u.PasswordMD5) != md5.DoMD5(pword) {
 		result.Code = ResultPasswordWrong
 		return &result, nil
 	}

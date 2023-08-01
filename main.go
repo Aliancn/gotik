@@ -45,5 +45,5 @@ func main() {
 	engine.POST("/douyin/user/register", register.RegisterHandler)
 	engine.POST("/douyin/user/login", login.LoginHandler)
 
-	engine.Run()
+	engine.Run("0.0.0.0:8888")
 }

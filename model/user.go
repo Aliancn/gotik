@@ -9,7 +9,7 @@ type User struct {
 	// 用户名
 	Username string `gorm:"unique"`
 	// 密码的md5摘要
-	PasswordMD5 string
+	PasswordMD5 []byte
 
 	// 头像图片
 	AvatarURL string

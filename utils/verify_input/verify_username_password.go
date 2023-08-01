@@ -6,7 +6,7 @@ import (
 
 // username的格式, 4~32个字符, 只能包含数字和字母
 func IsUsernameValid(uname string) bool {
-	if len(uname) > 32 || len(uname) < 3 {
+	if len(uname) > 32 || len(uname) < 4 {
 		return false
 	}
 

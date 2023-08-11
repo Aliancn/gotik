@@ -77,7 +77,7 @@ func GetUserInfoHandler(ctx *gin.Context) {
 			FollowerCount:   int(user.FollowerCount),
 			IsFollow:        false,
 			Avatar:          user.AvatarURL,
-			BackgroundImage: user.AvatarURL,
+			BackgroundImage: user.BackgroundImageURL,
 			Signature:       user.Signature,
 			TotalFavorited:  int(user.FavoritedCount),
 			WorkCount:       int(user.WorkCount),

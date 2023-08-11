@@ -65,7 +65,7 @@ func PublishHandler(ctx *gin.Context) {
 
 	currentCount := fileCounter.Add(1)
 	saveFName := fmt.Sprintf("%d.%s", currentCount, ext)
-	coverFName := fmt.Sprintf("%d-cover.png", currentCount)
+	coverFName := fmt.Sprintf("%d.png", currentCount)
 
 	err = ctx.SaveUploadedFile(file, "tmp/"+saveFName)
 	if err != nil {
@@ -90,7 +90,7 @@ func PublishHandler(ctx *gin.Context) {
 		panic(err)
 	}
 
-	err = imaging.Save(img, "tmp"+coverFName)
+	err = imaging.Save(img, "tmp/"+coverFName)
 	if err != nil {
 		panic(err)
 	}
@@ -102,18 +102,18 @@ func PublishHandler(ctx *gin.Context) {
 		output.StatusCode = err_comm.ErrcodeInternalError
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrcodeInternalError)
 		ctx.JSON(200, &output)
+		return
 	}
 
-	r, _, err := cosutil.Client.Object.Upload(context.Background(), saveFName, "tmp/"+coverFName, &cos.MultiUploadOptions{
+	_, _, err = cosutil.Client.Object.Upload(context.Background(), coverFName, "tmp/"+coverFName, &cos.MultiUploadOptions{
 		OptIni: &cos.InitiateMultipartUploadOptions{ACLHeaderOptions: &cos.ACLHeaderOptions{XCosACL: "public-read"}},
 	})
 	if err != nil {
 		output.StatusCode = err_comm.ErrcodeInternalError
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrcodeInternalError)
 		ctx.JSON(200, &output)
+		return
 	}
-
-	println(r.Location)
 
 	output.StatusCode = err_comm.ErrCodeOK
 	output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)

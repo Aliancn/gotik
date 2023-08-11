@@ -4,6 +4,7 @@ import (
 	"gotik/api"
 	"gotik/api/getuserinfo"
 	"gotik/api/login"
+	"gotik/api/publish"
 	"gotik/api/register"
 	"gotik/model"
 
@@ -46,6 +47,7 @@ func main() {
 	engine.POST("/douyin/user/register/", register.RegisterHandler)
 	engine.POST("/douyin/user/login/", login.LoginHandler)
 	engine.GET("/douyin/user/", getuserinfo.GetUserInfoHandler)
+	engine.POST("/douyin/publish/action", publish.PublishHandler)
 
 	engine.Run("0.0.0.0:8080")
 }

@@ -46,66 +46,60 @@ func GetUserInfoHandler(ctx *gin.Context) {
 	}
 
 	var logined = false
-	var loginedUsername = ""
 	tk := ctx.Query("token")
 	tkInfo, err := token.GetTokenInfoFromToken(tk)
 	if err == nil {
 		logined = true
-		loginedUsername = tkInfo.Username
 	}
 
-	user, err := svc_getuserinfo.DoGetUserInfo(api.DB, uint(userID))
+	result, err := svc_getuserinfo.DoGetUserInfo(api.DB, int(tkInfo.UserID), userID)
 	if err != nil {
 		panic(err)
 	}
 
-	if user == nil {
+	if result.Code == svc_getuserinfo.ResultCodeTargetNotFound {
 		output.StatusCode = err_comm.ErrCodeOK
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)
 		output.User = nil
 		ctx.JSON(200, &output)
 		return
 	}
+	userInfo := result.UserInfo
 
-	if !logined || (logined && user.Username == loginedUsername) {
+	if !logined || (logined && result.UserInfo.Username == tkInfo.Username) {
 		output.StatusCode = err_comm.ErrCodeOK
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)
 		output.User = &userInfoJSON{
-			ID:              user.ID,
-			Name:            user.Username,
-			FollowCount:     int(user.FollowCount),
-			FollowerCount:   int(user.FollowerCount),
+			ID:              userInfo.ID,
+			Name:            userInfo.Username,
+			FollowCount:     int(userInfo.FollowCount),
+			FollowerCount:   int(userInfo.FollowerCount),
 			IsFollow:        false,
-			Avatar:          user.AvatarURL,
-			BackgroundImage: user.BackgroundImageURL,
-			Signature:       user.Signature,
-			TotalFavorited:  int(user.FavoritedCount),
-			WorkCount:       int(user.WorkCount),
-			FavoriteCount:   int(user.FavoriteCount),
+			Avatar:          userInfo.AvatarURL,
+			BackgroundImage: userInfo.BackgroundImageURL,
+			Signature:       userInfo.Signature,
+			TotalFavorited:  int(userInfo.FavoritedCount),
+			WorkCount:       int(userInfo.WorkCount),
+			FavoriteCount:   int(userInfo.FavoriteCount),
 		}
 		ctx.JSON(200, &output)
 		return
 	}
 
-	isFollow, err := svc_getuserinfo.IsAFollowingB(api.DB, tkInfo.UserID, user.ID)
-	if err != nil {
-		panic(err)
-	}
-
 	output.StatusCode = err_comm.ErrCodeOK
 	output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)
 	output.User = &userInfoJSON{
-		ID:              user.ID,
-		Name:            user.Username,
-		FollowCount:     int(user.FollowCount),
-		FollowerCount:   int(user.FollowerCount),
-		IsFollow:        isFollow,
-		Avatar:          user.AvatarURL,
-		BackgroundImage: user.AvatarURL,
-		Signature:       user.Signature,
-		TotalFavorited:  int(user.FavoritedCount),
-		WorkCount:       int(user.WorkCount),
-		FavoriteCount:   int(user.FavoriteCount),
+		ID:              userInfo.ID,
+		Name:            userInfo.Username,
+		FollowCount:     int(userInfo.FollowCount),
+		FollowerCount:   int(userInfo.FollowerCount),
+		IsFollow:        result.IsFollow,
+		Avatar:          userInfo.AvatarURL,
+		BackgroundImage: userInfo.AvatarURL,
+		Signature:       userInfo.Signature,
+		TotalFavorited:  int(userInfo.FavoritedCount),
+		WorkCount:       int(userInfo.WorkCount),
+		FavoriteCount:   int(userInfo.FavoriteCount),
 	}
 	ctx.JSON(200, &output)
 }

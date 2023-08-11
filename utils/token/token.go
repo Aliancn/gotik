@@ -2,71 +2,80 @@ package token
 
 import (
 	"bytes"
-	"crypto/des"
+	"crypto/aes"
+	"crypto/cipher"
 	"encoding/base64"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
-	"math/rand"
-	"time"
+	"fmt"
 )
 
-var key []byte
-
-// 生成随机的密钥
-func init() {
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	r.Uint64()
-	k := make([]byte, 0, 8)
-	k = binary.BigEndian.AppendUint64(k, r.Uint64())
-	key = k
-}
+var key []byte = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32}
 
 // 下面的四个函数是我从百度上抄的对称加密解密的写法, 我自己也不懂
 
-func padPwd(srcByte []byte, blockSize int) []byte {
-	padNum := blockSize - len(srcByte)%blockSize
-	ret := bytes.Repeat([]byte{byte(padNum)}, padNum)
-	srcByte = append(srcByte, ret...)
-	return srcByte
-}
+func AesEncrypt(orig string, key string) string {
+	// 转成字节数组
+	origData := []byte(orig)
+	k := []byte(key)
 
-// 去掉填充的部分
-func unPadPwd(dst []byte) ([]byte, error) {
-	if len(dst) == 0 {
-		panic("dst length is zero")
-	}
-
-	unpadNum := int(dst[len(dst)-1])
-	return dst[:(len(dst) - unpadNum)], nil
-}
-
-func desEncoding(src string, key []byte) (string, error) {
-	srcByte := []byte(src)
-	block, err := des.NewCipher(key)
+	// 分组秘钥
+	block, err := aes.NewCipher(k)
 	if err != nil {
-		return src, err
+		panic(fmt.Sprintf("key 长度必须 16/24/32长度: %s", err.Error()))
 	}
-	newSrcByte := padPwd(srcByte, block.BlockSize())
-	dst := make([]byte, len(newSrcByte))
-	block.Encrypt(dst, newSrcByte)
-	pwd := base64.StdEncoding.EncodeToString(dst)
-	return pwd, nil
+	// 获取秘钥块的长度
+	blockSize := block.BlockSize()
+	// 补全码
+	origData = PKCS7Padding(origData, blockSize)
+	// 加密模式
+	blockMode := cipher.NewCBCEncrypter(block, k[:blockSize])
+	// 创建数组
+	cryted := make([]byte, len(origData))
+	// 加密
+	blockMode.CryptBlocks(cryted, origData)
+	//使用RawURLEncoding 不要使用StdEncoding
+	//不要使用StdEncoding  放在url参数中回导致错误
+	return base64.RawURLEncoding.EncodeToString(cryted)
+
 }
 
-func desDecoding(pwd string, key []byte) (string, error) {
-	pwdByte, err := base64.StdEncoding.DecodeString(pwd)
+func AesDecrypt(cryted string, key string) string {
+	//使用RawURLEncoding 不要使用StdEncoding
+	//不要使用StdEncoding  放在url参数中回导致错误
+	crytedByte, _ := base64.RawURLEncoding.DecodeString(cryted)
+	k := []byte(key)
+
+	// 分组秘钥
+	block, err := aes.NewCipher(k)
 	if err != nil {
-		return pwd, err
+		panic(fmt.Sprintf("key 长度必须 16/24/32长度: %s", err.Error()))
 	}
-	block, errBlock := des.NewCipher(key)
-	if errBlock != nil {
-		return pwd, errBlock
-	}
-	dst := make([]byte, len(pwdByte))
-	block.Decrypt(dst, pwdByte)
-	dst, _ = unPadPwd(dst)
-	return string(dst), nil
+	// 获取秘钥块的长度
+	blockSize := block.BlockSize()
+	// 加密模式
+	blockMode := cipher.NewCBCDecrypter(block, k[:blockSize])
+	// 创建数组
+	orig := make([]byte, len(crytedByte))
+	// 解密
+	blockMode.CryptBlocks(orig, crytedByte)
+	// 去补全码
+	orig = PKCS7UnPadding(orig)
+	return string(orig)
+}
+
+// 补码
+func PKCS7Padding(ciphertext []byte, blocksize int) []byte {
+	padding := blocksize - len(ciphertext)%blocksize
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(ciphertext, padtext...)
+}
+
+// 去码
+func PKCS7UnPadding(origData []byte) []byte {
+	length := len(origData)
+	unpadding := int(origData[length-1])
+	return origData[:(length - unpadding)]
 }
 
 type TokenInfo struct {
@@ -84,19 +93,13 @@ func NewToken(uid uint, uname string) string {
 		panic("unexpected error")
 	}
 
-	token, err := desEncoding(string(bs), key)
-	if err != nil {
-		panic(err)
-	}
+	token := AesEncrypt(string(bs), string(key))
 
 	return token
 }
 
 func GetTokenInfoFromToken(token string) (*TokenInfo, error) {
-	infoBytes, err := desDecoding(token, key)
-	if err != nil {
-		return nil, errors.New("invalid token")
-	}
+	infoBytes := AesDecrypt(token, string(key))
 
 	ti := TokenInfo{}
 	if err := json.Unmarshal([]byte(infoBytes), &ti); err != nil {

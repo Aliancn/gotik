@@ -17,7 +17,7 @@ func init() {
 	Client = cos.NewClient(&cos.BaseURL{BucketURL: bucketURL}, &http.Client{
 		Transport: &cos.AuthorizationTransport{
 			SecretID:  "AKID60gJitpdEaibIlodEdnkT6Xrxyay72jM",
-			SecretKey: "xxx",
+			SecretKey: "ThhV6TecOwIQJzReiYCcolV1INEsIl01",
 		},
 	})
 }

@@ -70,13 +70,13 @@ func desDecoding(pwd string, key []byte) (string, error) {
 }
 
 type TokenInfo struct {
-	Username  string `json:"username"`
-	CreatedAt int64  `json:"time_stamp"`
+	UserID   uint   `json:"userid"`
+	Username string `json:"username"`
 }
 
-func NewToken(uname string) string {
+func NewToken(uid uint, uname string) string {
 	info := TokenInfo{}
-	info.CreatedAt = time.Now().Unix()
+	info.UserID = uid
 	info.Username = uname
 
 	bs, err := json.Marshal(&info)

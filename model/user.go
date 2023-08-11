@@ -27,9 +27,6 @@ type User struct {
 	// 被关注的数目
 	FollowerCount uint
 
-	// 自己是否关注了此用户
-	IsFollow bool
-
 	// 个性签名
 	Signature string
 

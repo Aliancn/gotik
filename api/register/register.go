@@ -47,7 +47,7 @@ func RegisterHandler(ctx *gin.Context) {
 		outputData.StatusCode = err_comm.ErrCodeOK
 		outputData.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)
 		outputData.UserID = result.ID
-		outputData.Token = token.NewToken(username)
+		outputData.Token = token.NewToken(result.ID, username)
 
 		ctx.JSON(200, &outputData)
 		return

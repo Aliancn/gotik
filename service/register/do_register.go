@@ -3,7 +3,9 @@ package register
 import (
 	"errors"
 	"gotik/model"
+	"gotik/utils/consts"
 	"gotik/utils/md5"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -26,8 +28,17 @@ func DoRegister(db *gorm.DB, uname string, pword string) (*Result, error) {
 
 	// 执行插入
 	newUser := model.User{
-		Username:    uname,
-		PasswordMD5: []byte(md5.DoMD5(pword)),
+		Username:           uname,
+		PasswordMD5:        []byte(md5.DoMD5(pword)),
+		AvatarURL:          consts.DefaultAvatar,
+		BackgroundImageURL: consts.DefaultBackground,
+		FavoritedCount:     0,
+		WorkCount:          0,
+		FavoriteCount:      0,
+		FollowCount:        0,
+		FollowerCount:      0,
+		Signature:          "默认签名",
+		CreatedAt:          time.Now(),
 	}
 
 	// 这里用到了个技巧, 利用unique的错误代码来判断用户名是否被注册

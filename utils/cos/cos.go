@@ -1,0 +1,4 @@
+package cos
+
+func Test() {
+}

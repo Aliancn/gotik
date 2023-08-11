@@ -1,4 +1,4 @@
-package userinfo
+package getuserinfo
 
 import (
 	"gotik/api"

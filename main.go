@@ -2,6 +2,7 @@ package main
 
 import (
 	"gotik/api"
+	"gotik/api/getuserinfo"
 	"gotik/api/login"
 	"gotik/api/register"
 	"gotik/model"
@@ -44,6 +45,7 @@ func main() {
 
 	engine.POST("/douyin/user/register/", register.RegisterHandler)
 	engine.POST("/douyin/user/login/", login.LoginHandler)
+	engine.GET("/douyin/user/", getuserinfo.GetUserInfoHandler)
 
-	engine.Run("0.0.0.0:8888")
+	engine.Run("0.0.0.0:8080")
 }

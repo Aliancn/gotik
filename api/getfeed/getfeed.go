@@ -1,6 +1,7 @@
 package feed
 
 import (
+	"fmt"
 	"gotik/api"
 	svc_getfeed "gotik/service/getfeed"
 	err_comm "gotik/utils/error_codes/common"
@@ -48,6 +49,7 @@ func FeedHandler(ctx *gin.Context) {
 	lastTimeStr := ctx.Query("latest_time")
 
 	lastTime, err := strconv.ParseInt(lastTimeStr, 10, 64)
+	fmt.Println(lastTime)
 	if err != nil {
 		output.StatusCode = err_comm.ErrCodeInvalidArgs
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
@@ -89,6 +91,8 @@ func FeedHandler(ctx *gin.Context) {
 			Title:         v.Video.Title})
 		output.NextTime = int(v.Video.ID)
 	}
+
+	fmt.Println(lastTime, len(lis))
 
 	ctx.JSON(200, &output)
 }

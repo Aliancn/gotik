@@ -47,7 +47,7 @@ func FeedHandler(ctx *gin.Context) {
 
 	lastTimeStr := ctx.Query("last_time")
 
-	lastTime, err := strconv.Atoi(lastTimeStr)
+	lastTime, err := strconv.ParseInt(lastTimeStr, 10, 64)
 	if err != nil {
 		output.StatusCode = err_comm.ErrCodeInvalidArgs
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)

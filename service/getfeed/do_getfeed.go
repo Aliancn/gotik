@@ -28,7 +28,7 @@ const (
 // TODO: 不一致问题, 先查entry再查user的问题
 //
 //	follow和followed_count
-func DoGetFeed(db *gorm.DB, selfUserID int, upperID int) (*Result, error) {
+func DoGetFeed(db *gorm.DB, selfUserID int, upperID int64) (*Result, error) {
 	resultEntries := make([]*ResultDataEntry, 0, 10)
 
 	var videos []*model.Video

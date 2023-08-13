@@ -10,7 +10,7 @@ import (
 var DB *gorm.DB
 
 func init() {
-	dsn := "root:mark2004@tcp(127.0.0.1:8888)/gotik?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:mark2004@tcp(127.0.0.1:3306)/gotik?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{TranslateError: true})
 	if err != nil {
 		panic(err)

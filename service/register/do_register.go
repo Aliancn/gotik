@@ -12,7 +12,7 @@ import (
 
 type Result struct {
 	Code ResultCode
-	ID   uint
+	ID   int
 }
 
 type ResultCode int
@@ -64,6 +64,6 @@ func DoRegister(db *gorm.DB, uname string, pword string) (*Result, error) {
 	// 返回插入的数据
 	return &Result{
 		Code: ResultOK,
-		ID:   newUser.ID,
+		ID:   int(newUser.ID),
 	}, nil
 }

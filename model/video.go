@@ -20,9 +20,6 @@ type Video struct {
 	// 评论数目
 	CommentCount uint
 
-	// 自己是否赞了此作品
-	IsFavorite bool
-
 	// 发布日期
 	PublishedAt time.Time
 }

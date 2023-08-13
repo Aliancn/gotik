@@ -39,7 +39,7 @@ func DoLogin(db *gorm.DB, uname string, pword string) (*Result, error) {
 	}
 
 	result.Code = ResultOK
-	result.Token = token.NewToken(u.ID, uname)
+	result.Token = token.NewToken(int(u.ID), uname)
 	result.UserID = u.ID
 	return &result, nil
 }

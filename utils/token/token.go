@@ -79,11 +79,11 @@ func PKCS7UnPadding(origData []byte) []byte {
 }
 
 type TokenInfo struct {
-	UserID   uint   `json:"userid"`
+	UserID   int    `json:"userid"`
 	Username string `json:"username"`
 }
 
-func NewToken(uid uint, uname string) string {
+func NewToken(uid int, uname string) string {
 	info := TokenInfo{}
 	info.UserID = uid
 	info.Username = uname

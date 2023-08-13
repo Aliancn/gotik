@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"gotik/api"
+	svc_publish "gotik/service/publish"
 	cosutil "gotik/utils/cos"
 	"gotik/utils/fileutil"
 	"gotik/utils/token"
@@ -31,7 +33,7 @@ func PublishHandler(ctx *gin.Context) {
 	output := publishOutput{}
 
 	tk := ctx.Request.FormValue("token")
-	_, err := token.GetTokenInfoFromToken(tk)
+	tkInfo, err := token.GetTokenInfoFromToken(tk)
 	if err != nil {
 		output.StatusCode = err_comm.ErrcodePermissionDenied
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrcodePermissionDenied)
@@ -95,7 +97,7 @@ func PublishHandler(ctx *gin.Context) {
 		panic(err)
 	}
 
-	_, _, err = cosutil.Client.Object.Upload(context.Background(), saveFName, "tmp/"+saveFName, &cos.MultiUploadOptions{
+	rVideo, _, err := cosutil.Client.Object.Upload(context.Background(), saveFName, "tmp/"+saveFName, &cos.MultiUploadOptions{
 		OptIni: &cos.InitiateMultipartUploadOptions{ACLHeaderOptions: &cos.ACLHeaderOptions{XCosACL: "public-read"}},
 	})
 	if err != nil {
@@ -105,7 +107,7 @@ func PublishHandler(ctx *gin.Context) {
 		return
 	}
 
-	_, _, err = cosutil.Client.Object.Upload(context.Background(), coverFName, "tmp/"+coverFName, &cos.MultiUploadOptions{
+	rCover, _, err := cosutil.Client.Object.Upload(context.Background(), coverFName, "tmp/"+coverFName, &cos.MultiUploadOptions{
 		OptIni: &cos.InitiateMultipartUploadOptions{ACLHeaderOptions: &cos.ACLHeaderOptions{XCosACL: "public-read"}},
 	})
 	if err != nil {
@@ -113,6 +115,11 @@ func PublishHandler(ctx *gin.Context) {
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrcodeInternalError)
 		ctx.JSON(200, &output)
 		return
+	}
+
+	_, err = svc_publish.DoPublish(api.DB, tkInfo.UserID, title, rCover.Location, rVideo.Location)
+	if err != nil {
+		panic(err)
 	}
 
 	output.StatusCode = err_comm.ErrCodeOK

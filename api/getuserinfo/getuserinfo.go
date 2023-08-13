@@ -45,14 +45,13 @@ func GetUserInfoHandler(ctx *gin.Context) {
 		return
 	}
 
-	var logined = false
 	tk := ctx.Query("token")
 	tkInfo, err := token.GetTokenInfoFromToken(tk)
 	if err == nil {
-		logined = true
+		tkInfo.UserID = -1
 	}
 
-	result, err := svc_getuserinfo.DoGetUserInfo(api.DB, int(tkInfo.UserID), userID)
+	result, err := svc_getuserinfo.DoGetUserInfo(api.DB, tkInfo.UserID, userID)
 	if err != nil {
 		panic(err)
 	}
@@ -65,26 +64,6 @@ func GetUserInfoHandler(ctx *gin.Context) {
 		return
 	}
 	userInfo := result.UserInfo
-
-	if !logined || (logined && result.UserInfo.Username == tkInfo.Username) {
-		output.StatusCode = err_comm.ErrCodeOK
-		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)
-		output.User = &userInfoJSON{
-			ID:              userInfo.ID,
-			Name:            userInfo.Username,
-			FollowCount:     int(userInfo.FollowCount),
-			FollowerCount:   int(userInfo.FollowerCount),
-			IsFollow:        false,
-			Avatar:          userInfo.AvatarURL,
-			BackgroundImage: userInfo.BackgroundImageURL,
-			Signature:       userInfo.Signature,
-			TotalFavorited:  int(userInfo.FavoritedCount),
-			WorkCount:       int(userInfo.WorkCount),
-			FavoriteCount:   int(userInfo.FavoriteCount),
-		}
-		ctx.JSON(200, &output)
-		return
-	}
 
 	output.StatusCode = err_comm.ErrCodeOK
 	output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeOK)

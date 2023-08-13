@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gotik/api/feed"
+	feed "gotik/api/getfeed"
 	"gotik/api/getuserinfo"
 	"gotik/api/login"
 	"gotik/api/publish"
@@ -20,5 +20,5 @@ func main() {
 	engine.POST("/douyin/publish/action/", publish.PublishHandler)
 	engine.GET("/douyin/feed/", feed.FeedHandler)
 
-	engine.Run("0.0.0.0:8080")
+	engine.Run("0.0.0.0:8888")
 }

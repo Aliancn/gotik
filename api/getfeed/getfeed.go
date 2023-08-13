@@ -45,7 +45,7 @@ type outputJSON struct {
 func FeedHandler(ctx *gin.Context) {
 	output := outputJSON{}
 
-	lastTimeStr := ctx.Query("last_time")
+	lastTimeStr := ctx.Query("latest_time")
 
 	lastTime, err := strconv.ParseInt(lastTimeStr, 10, 64)
 	if err != nil {

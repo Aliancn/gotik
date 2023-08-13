@@ -87,6 +87,7 @@ func FeedHandler(ctx *gin.Context) {
 			CommentCount:  int(v.Video.CommentCount),
 			IsFavorite:    v.IsFavoriteVideo,
 			Title:         v.Video.Title})
+		output.NextTime = int(v.Video.ID)
 	}
 
 	ctx.JSON(200, &output)

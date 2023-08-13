@@ -51,7 +51,7 @@ func DoGetFeed(db *gorm.DB, selfUserID int, upperID int64) (*Result, error) {
 			entry.IsFavoriteVideo = false
 		} else {
 			var cnt int64
-			err := db.Model(&model.User{}).Where("user_id = ? AND followed_user_id = ?", selfUserID, user.ID).Count(&cnt).Error
+			err := db.Model(&model.UserFollow{}).Where("user_id = ? AND followed_user_id = ?", selfUserID, user.ID).Count(&cnt).Error
 			if err != nil {
 				return nil, err
 			}

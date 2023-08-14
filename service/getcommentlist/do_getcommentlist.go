@@ -18,7 +18,7 @@ const (
 	ResultCodeTargetNotFound
 )
 
-func DoGetFavorList(db *gorm.DB, videoID int) (*Result, error) {
+func DoGetCommentList(db *gorm.DB, videoID int) (*Result, error) {
 	result := Result{}
 
 	tx := db.Begin()

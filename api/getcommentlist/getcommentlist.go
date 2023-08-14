@@ -17,7 +17,7 @@ type GetCommentListOutput struct {
 	StatusMsg   string    `json:"status_msg"`   // 返回状态描述
 }
 
-// Comment
+// Comment 评论
 type Comment struct {
 	Content    string `json:"content"`     // 评论内容
 	CreateDate string `json:"create_date"` // 评论发布日期，格式 mm-dd
@@ -25,8 +25,7 @@ type Comment struct {
 	User       User   `json:"user"`        // 评论用户信息
 }
 
-// 评论用户信息
-// User
+// User 评论用户信息
 type User struct {
 	Avatar          string `json:"avatar"`           // 用户头像
 	BackgroundImage string `json:"background_image"` // 用户个人页顶部大图
@@ -54,20 +53,16 @@ func GetFavorListHandler(ctx *gin.Context) {
 		ctx.JSON(200, &output)
 	}
 
-	// todo 用户鉴权
+	// 用户鉴权
 	var logined = false
 	tk := ctx.Query("token")
 	tkInfo, err := token.GetTokenInfoFromToken(tk)
 	if err == nil {
 		logined = true
 	}
-	// todo 对于没有登陆的怎么处理
-	//if !logined {
-	//
-	//}
 
 	// 根据ID查询comment列表
-	resultCom, err := svc_getcommentlist.DoGetFavorList(api.DB, videoID)
+	resultCom, err := svc_getcommentlist.DoGetCommentList(api.DB, videoID)
 	if err != nil {
 		panic(err)
 	}
@@ -101,7 +96,7 @@ func GetFavorListHandler(ctx *gin.Context) {
 		authorInfo := resultAut.UserInfo
 
 		var isFollow bool
-		if authorInfo.Username == tkInfo.Username || !logined {
+		if int(authorInfo.ID) == tkInfo.UserID || !logined {
 			isFollow = false
 		} else {
 			isFollow = resultAut.IsFollow
@@ -115,7 +110,7 @@ func GetFavorListHandler(ctx *gin.Context) {
 
 		result = append(result, Comment{
 			Content:    comment.Content,
-			CreateDate: "",
+			CreateDate: comment.CreateDate.Format("01-02"),
 			ID:         int64(comment.ID),
 			User: User{
 				Avatar:          authorInfo.AvatarURL,

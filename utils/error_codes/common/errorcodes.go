@@ -4,19 +4,22 @@ package common
 
 const ErrCodeOK = 0
 const ErrCodeInvalidArgs = 10000
-const ErrcodePermissionDenied = 10001
-const ErrcodeInternalError = 10003
+const ErrCodePermissionDenied = 10001
+const ErrCodeInternalError = 10003
+const ErrCodeNotLogin = 10004
 
 func GetStatusMessage(code int) string {
 	switch code {
 	case ErrCodeOK:
 		return "ok"
-	case ErrcodePermissionDenied:
+	case ErrCodePermissionDenied:
 		return "permission denied"
 	case ErrCodeInvalidArgs:
 		return "invalid arguments"
-	case ErrcodeInternalError:
+	case ErrCodeInternalError:
 		return "internal error, try again"
+	case ErrCodeNotLogin:
+		return "Not login, Please login and try again"
 	}
 	panic("unreachable")
 }

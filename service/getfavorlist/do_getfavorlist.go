@@ -9,7 +9,7 @@ import (
 type Result struct {
 	Code      ResultCode
 	VideoList []model.Video
-	VideoNum  int64
+	VideoNum  int64 // 点赞的视频总数
 }
 
 type ResultCode int

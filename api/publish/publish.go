@@ -35,8 +35,8 @@ func PublishHandler(ctx *gin.Context) {
 	tk := ctx.Request.FormValue("token")
 	tkInfo, err := token.GetTokenInfoFromToken(tk)
 	if err != nil {
-		output.StatusCode = err_comm.ErrcodePermissionDenied
-		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrcodePermissionDenied)
+		output.StatusCode = err_comm.ErrCodePermissionDenied
+		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodePermissionDenied)
 		ctx.JSON(200, &output)
 		return
 	}
@@ -71,7 +71,7 @@ func PublishHandler(ctx *gin.Context) {
 
 	err = ctx.SaveUploadedFile(file, "tmp/"+saveFName)
 	if err != nil {
-		output.StatusCode = err_comm.ErrcodeInternalError
+		output.StatusCode = err_comm.ErrCodeInternalError
 		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInvalidArgs)
 		ctx.JSON(200, &output)
 		return
@@ -101,8 +101,8 @@ func PublishHandler(ctx *gin.Context) {
 		OptIni: &cos.InitiateMultipartUploadOptions{ACLHeaderOptions: &cos.ACLHeaderOptions{XCosACL: "public-read"}},
 	})
 	if err != nil {
-		output.StatusCode = err_comm.ErrcodeInternalError
-		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrcodeInternalError)
+		output.StatusCode = err_comm.ErrCodeInternalError
+		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInternalError)
 		ctx.JSON(200, &output)
 		return
 	}
@@ -111,8 +111,8 @@ func PublishHandler(ctx *gin.Context) {
 		OptIni: &cos.InitiateMultipartUploadOptions{ACLHeaderOptions: &cos.ACLHeaderOptions{XCosACL: "public-read"}},
 	})
 	if err != nil {
-		output.StatusCode = err_comm.ErrcodeInternalError
-		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrcodeInternalError)
+		output.StatusCode = err_comm.ErrCodeInternalError
+		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeInternalError)
 		ctx.JSON(200, &output)
 		return
 	}

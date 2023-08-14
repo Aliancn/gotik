@@ -17,7 +17,7 @@ const (
 	ResultCodeTargetNotFound
 )
 
-// DOGetAuthorInfo 根据userID获取
+// DOGetWorkNumber  根据userID获取用户作品数量
 func DOGetWorkNumber(db *gorm.DB, userID uint) (*Result, error) {
 	result := Result{}
 
@@ -26,7 +26,7 @@ func DOGetWorkNumber(db *gorm.DB, userID uint) (*Result, error) {
 
 	err := tx.Clauses(clause.Locking{
 		Strength: "SHARE",
-	}).Where("id = ? ", userID).First(&model.UserVideo{}).Error
+	}).Where("id = ? ", userID).Find(&model.UserVideo{}).Error
 	if err != nil {
 		return nil, err
 	}

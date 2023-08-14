@@ -59,16 +59,18 @@ func GetFavorListHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, &output)
 	}
 
-	// todo 用户鉴权
+	// 用户鉴权
 	var logined = false
 	tk := ctx.Query("token")
 	tkInfo, err := token.GetTokenInfoFromToken(tk)
 	if err == nil {
 		logined = true
 	}
-	// todo 对于没有登陆的怎么处理
 	if !logined {
-
+		output.StatusCode = err_comm.ErrCodeNotLogin
+		output.StatusMsg = err_comm.GetStatusMessage(err_comm.ErrCodeNotLogin)
+		output.VideoList = nil
+		ctx.JSON(http.StatusOK, &output)
 	}
 
 	// 根据ID查询Favor列表
@@ -106,7 +108,7 @@ func GetFavorListHandler(ctx *gin.Context) {
 		authorInfo := resultAut.UserInfo
 
 		var isFollow bool
-		if authorInfo.Username == tkInfo.Username {
+		if int(authorInfo.ID) == tkInfo.UserID {
 			isFollow = false
 		} else {
 			isFollow = resultAut.IsFollow
@@ -136,7 +138,7 @@ func GetFavorListHandler(ctx *gin.Context) {
 			CoverURL:      video.CoverURL,
 			FavoriteCount: int64(video.FavoriteCount),
 			ID:            int64(video.ID),
-			IsFavorite:    false, // todo 这里改了表结构导致字段失效
+			IsFavorite:    true, // 表结构没有该字段 但由于这里查询的是点赞的video 所以是true
 			PlayURL:       video.PlayURL,
 			Title:         video.Title,
 		})

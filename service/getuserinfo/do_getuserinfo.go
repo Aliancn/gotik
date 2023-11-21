@@ -20,7 +20,7 @@ const (
 	ResultCodeTargetNotFound
 )
 
-// is not exists, return nil, err
+// DoGetUserInfo is not exists, return nil, err
 // selfUserID == -1 那么表示未登录用户
 func DoGetUserInfo(db *gorm.DB, selfUserID int, targetUserID int) (*Result, error) {
 	result := Result{}
